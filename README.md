@@ -17,7 +17,7 @@
 
 </div>
 
-> **Estado: desarrollo y pruebas.** NEXO ya cuenta con una base multiusuario funcional, pero aún necesita mejoras de seguridad, moderación, infraestructura y validación antes de admitir registro público. Consulta la [auditoría técnica](docs/auditoria.md) y la [arquitectura](docs/arquitectura.md).
+> **Estado: desarrollo y pruebas.** La integración de Neon y Cloudinary requiere verificación con credenciales y servicios reales. NEXO ya cuenta con una base multiusuario funcional, pero aún necesita mejoras de seguridad, moderación, infraestructura y validación antes de admitir registro público. Consulta la [auditoría técnica](docs/auditoria.md) y la [arquitectura](docs/arquitectura.md).
 
 ---
 
@@ -84,13 +84,14 @@ Cada página puede configurar un aviso con título, detalles, fecha o lugar, ima
 
 - **Node.js 22.13 o superior**, con soporte para `node:sqlite`.
 - npm, incluido habitualmente con Node.js.
-- No se requiere instalar paquetes externos para ejecutar la versión actual.
+- Instala las dependencias del proyecto con `npm ci`.
 
 ### Ejecutar en local
 
 ```bash
 git clone https://github.com/cponce123com-create/nexo.git
 cd nexo
+npm ci
 npm start
 ```
 
@@ -108,12 +109,20 @@ Para explorar el diseño sin crear una cuenta, abre **[http://localhost:3000/dem
 
 Si el servicio de correo está configurado, se debe verificar la cuenta antes de publicar. Para cambiar el nombre de usuario de una página publicada, primero hay que despublicarla.
 
+## Render Free + Neon + Cloudinary
+
+NEXO incluye una configuración para ejecutar el servidor en Render Free, guardar los datos en Neon PostgreSQL y almacenar las imágenes en Cloudinary. **La integración se ha probado con servicios simulados; falta verificarla con cuentas reales.** Consulta la [guía de configuración y comprobación](docs/render-neon-cloudinary.md).
+
+Para una instalación nueva configura `DATABASE_URL`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `RESEND_API_KEY`, `MAIL_FROM` y `PUBLIC_URL` en Render. El archivo `render.yaml` proporciona una base para el despliegue. No existe todavía migración automática de una base SQLite previa.
+
 ## Configuración
 
 Las variables se leen del entorno del proceso. El proyecto **no carga archivos `.env` automáticamente**: usa la configuración de tu sistema o de tu proveedor de alojamiento.
 
 | Variable | Uso | Valor predeterminado / requisito |
 | --- | --- | --- |
+| `DATABASE_URL` | Conexión PostgreSQL a Neon. | Requerida en producción; usar TLS. |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Acceso a Cloudinary desde el servidor. | Requeridas en producción. |
 | `PORT` | Puerto HTTP. | `3000` |
 | `DATABASE_PATH` | Ruta del archivo SQLite. | `nexo.sqlite` en el directorio de ejecución. |
 | `NODE_ENV` | En `production`, activa cookies `Secure` y exige la configuración de correo al arrancar. | Sin valor predeterminado explícito. |
@@ -135,12 +144,13 @@ En desarrollo, si falta la configuración de correo, la aplicación omite la ver
 
 ## Arquitectura
 
-NEXO utiliza una aplicación web con módulos JavaScript y un servidor HTTP Node.js. La base SQLite almacena cuentas, páginas, sesiones, imágenes y estadísticas. El correo se integra mediante una API externa cuando está configurado.
+NEXO utiliza una aplicación web con módulos JavaScript y un servidor HTTP Node.js. En producción PostgreSQL almacena cuentas, páginas, sesiones, referencias de imágenes y estadísticas; Cloudinary almacena las imágenes. SQLite sigue disponible para desarrollo local. El correo se integra mediante una API externa cuando está configurado.
 
 ```mermaid
 flowchart TD
     Browser["Navegador: editor y página pública"] --> Server["Servidor HTTP Node.js"]
-    Server --> DB[("SQLite")]
+    Server --> DB[("Neon PostgreSQL")]
+    Server --> Media["Cloudinary"]
     Server --> Mail["Proveedor de correo"]
     Browser --> Chat["WhatsApp / Telegram"]
 ```
@@ -149,8 +159,8 @@ flowchart TD
 | --- | --- | --- |
 | Interfaz | HTML, CSS y JavaScript modular | Editor, vista previa, demostración y página pública. |
 | Servidor | HTTP de Node.js | Rutas, sesiones, validación y autorización por usuario. |
-| Datos | `node:sqlite` y SQLite | Borradores, publicaciones, cuentas, archivos y visitas agregadas. |
-| Imágenes | BLOB en SQLite o URL externa | Productos y flyers; con límites y control básico de acceso. |
+| Datos | PostgreSQL con `pg`; SQLite local | Borradores, publicaciones, cuentas, archivos y visitas agregadas. |
+| Imágenes | Cloudinary autenticado o URL externa; SQLite local | Productos y flyers; con límites y control básico de acceso. |
 | Correo | API de Resend, opcional en desarrollo | Enlaces de verificación y recuperación. |
 | Pruebas | `node:test` | Pruebas de modelo y recorridos HTTP entre cuentas. |
 
@@ -173,7 +183,8 @@ Las tablas `users`, `sessions`, `pages`, `images`, `account_tokens` y `daily_vie
 | --- | --- |
 | `server.js` | Arranque, configuración básica y cierre del servidor. |
 | `server/app.js` | Rutas HTTP, autenticación, publicación y control de acceso. |
-| `server/database.js` | Creación de tablas y apertura de SQLite. |
+| `server/database.js` y `server/postgres.js` | Apertura de SQLite local y PostgreSQL. |
+| `server/cloud.js` | Procesamiento y almacenamiento protegido en Cloudinary. |
 | `server/security.js` | Contraseñas, tokens, sesiones y validaciones de identidad. |
 | `server/images.js` | Validación inicial de imágenes importadas. |
 | `server/mail.js` | Integración de correo de verificación y recuperación. |
@@ -218,9 +229,9 @@ Las rutas, el esquema y los controles pueden evolucionar; consulta el código y 
 | **Cuota** | Hasta 30 imágenes y 20 MB por cuenta. |
 | **Privacidad** | Una imagen importada está disponible para su propietario y, según corresponda, cuando se usa en un producto visible o aviso publicado. |
 | **Limpieza** | Al cargar otra imagen, se eliminan las imágenes sin referencias en borrador o publicación que tengan más de 24 horas. Guarda la imagen asociada antes de ese plazo. |
-| **Ubicación** | Las imágenes importadas se guardan en SQLite. El archivo de base de datos debe estar en almacenamiento persistente. |
+| **Ubicación** | En producción las imágenes importadas se guardan en Cloudinary y sus referencias en PostgreSQL; en desarrollo local se guardan en SQLite. |
 
-Crear una copia de seguridad:
+Para una instalación local SQLite, crear una copia de seguridad:
 
 ```bash
 node scripts/backup.js ruta/a/nexo.sqlite ruta/a/copia-nueva.sqlite
@@ -235,7 +246,7 @@ La implementación actual incluye contraseñas con `scrypt` y sal, tokens de ses
 Estas medidas son una **base inicial**. Antes de operar públicamente aún deben completarse, entre otros puntos:
 
 - Moderación, reportes, límites de abuso y herramientas administrativas auditadas.
-- Procesamiento reforzado de imágenes: actualmente se comprueba la firma, pero no se decodifican ni reprocesan los archivos.
+- Revisión de seguridad y límites de las imágenes: en Cloudinary se decodifican y reprocesan; el almacenamiento SQLite local solo comprueba la firma.
 - Un sistema de límite de solicitudes compartido entre instancias, monitoreo y protección operativa.
 - Pruebas reales de correo, HTTPS, políticas de privacidad, recuperación y restauración de copias.
 - Pruebas visuales, de accesibilidad, carga y seguridad adicionales.
@@ -252,7 +263,7 @@ Las pruebas cubren, entre otros recorridos, la normalización de datos, descuent
 
 | Prioridad | Pendiente |
 | --- | --- |
-| Alta | Preparar almacenamiento persistente y migración a PostgreSQL para un despliegue que pueda escalar. |
+| Alta | Validar la integración real de Neon y Cloudinary, respaldos y migración de instalaciones SQLite existentes. |
 | Alta | Incorporar moderación, reportes y protección contra abuso. |
 | Alta | Validar el correo real y reforzar el procesamiento y almacenamiento de imágenes. |
 | Media | Añadir MFA, observabilidad, administración auditada y limpieza automatizada de datos. |

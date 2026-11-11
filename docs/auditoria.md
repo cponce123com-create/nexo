@@ -11,7 +11,7 @@
 
 ## Riesgos y pendientes antes de producción
 
-1. **Crítico:** SQLite y el limitador local son de una sola instancia. Migrar a PostgreSQL y un límite de solicitudes compartido; no alojar en disco efímero.
+1. **Crítico:** PostgreSQL y Cloudinary requieren validación real; el limitador permanece local por instancia. No usar SQLite en disco efímero para datos reales y diseñar un limitador compartido.
 2. **Alto:** falta moderación, reportes, límites por cuenta, protección frente a abuso y operación administrativa auditada.
 3. **Alto:** validar la integración real de correo, dominio, entrega, configuración HTTPS y políticas de recuperación. La versión de desarrollo omite verificación sin correo configurado.
 4. **Alto:** falta almacenamiento y validación segura de imágenes, así como restricciones de contenidos externos; los enlaces remotos exponen la solicitud al servidor de imágenes.
@@ -35,5 +35,5 @@ Limitación: no fue posible abrir el servidor local desde el navegador disponibl
 
 - El precio normal y la oferta se validan en cliente y servidor; la oferta debe ser menor que el precio normal y acepta hasta dos decimales. El porcentaje se calcula sobre céntimos y el mensaje de WhatsApp usa el precio final.
 - La imagen importada es privada hasta que forme parte de un producto visible publicado. El servidor comprueba que pertenezca a la cuenta; se limitan tipo, tamaño y almacenamiento.
-- Las imágenes se guardan en SQLite, no en almacenamiento de objetos. Se comprueba la firma de los formatos aceptados, pero todavía no se decodifican ni se reprocesan; hace falta endurecer esa validación antes del despliegue público.
+- En la modalidad PostgreSQL/Cloudinary las imágenes se reprocesan y guardan con entrega autenticada; la validación contra el servicio real está pendiente. En SQLite local solo se comprueba la firma.
 - Quedan pendientes las pruebas visuales y de interacción en navegador, los servicios de almacenamiento escalable y la configuración de infraestructura persistente.
