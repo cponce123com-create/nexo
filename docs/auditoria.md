@@ -20,3 +20,13 @@
 7. **Medio:** la interfaz aún no implementa bloques de texto, video ni galerías; no se ha probado un servicio de correo real ni un despliegue en la nube.
 
 Las pruebas automatizadas cubren modelos, enlaces, tiendas y flujos HTTP, pero no constituyen una auditoría externa ni una prueba integral de seguridad. No habilitar registro público todavía.
+
+## Revisión de lógica, geometría y conexiones
+
+- El guardado y la publicación conservan las ediciones realizadas mientras se espera la respuesta; se evitan envíos simultáneos desde esos controles.
+- El enlace público utiliza el nombre guardado, no el texto aún no guardado en el campo de edición.
+- Los mensajes de resultado aparecen junto a los botones de acción y el servidor rechaza duplicados o límites excedidos.
+- El texto de los enlaces cambia entre claro y oscuro según el contraste del color elegido; se han ajustado contenedores para pantallas estrechas.
+- Se han añadido comprobaciones automatizadas de estos límites y del contraste.
+
+Limitación: no fue posible abrir el servidor local desde el navegador disponible en este entorno. La geometría visual y los recorridos completos mediante clics en móvil y escritorio requieren verificarse en un navegador conectado al servidor antes de su publicación.
