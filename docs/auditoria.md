@@ -37,3 +37,7 @@ Limitación: no fue posible abrir el servidor local desde el navegador disponibl
 - La imagen importada es privada hasta que forme parte de un producto visible publicado. El servidor comprueba que pertenezca a la cuenta; se limitan tipo, tamaño y almacenamiento.
 - En la modalidad PostgreSQL/Cloudinary las imágenes se reprocesan y guardan con entrega autenticada; la validación contra el servicio real está pendiente. En SQLite local solo se comprueba la firma.
 - Quedan pendientes las pruebas visuales y de interacción en navegador, los servicios de almacenamiento escalable y la configuración de infraestructura persistente.
+
+## Galería, avisos y moderación básica
+
+Se incorporaron galería de imágenes/enlaces de video, cuatro avisos adicionales, reportes con revisión por administradores de correo verificado y exportación ZIP. Se probaron permisos y aislamiento usando SQLite y PostgreSQL emulado; el proveedor real y la interfaz visual siguen pendientes de validación. La despublicación de moderación no impide republicar, y todavía faltan suspensión, apelaciones, antispam distribuido y políticas de retención de reportes.
