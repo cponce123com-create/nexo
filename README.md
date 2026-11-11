@@ -301,3 +301,9 @@ Para aplicar las nuevas tablas de estadísticas, la aplicación crea las tablas 
 - **ZIP:** incluye `perfil.json` y las imágenes importadas de la cuenta; no incluye estadísticas ni archivos alojados en URLs externas. El ZIP contiene datos privados: guárdalo de forma segura.
 
 Las tablas de reportes y auditoría se crean al iniciar; revisa permisos de PostgreSQL y ten una copia de seguridad antes de actualizar una instalación con datos.
+
+### Proxy de Render y conservación de imágenes
+
+El Blueprint configura `TRUST_RENDER_PROXY=true` para identificar visitantes a través de `CF-Connecting-IP`, la cabecera que Render indica que Cloudflare sobrescribe. Actívala únicamente cuando todas las conexiones entren por el proxy de Render; en despliegues con acceso directo deja la variable desactivada, porque un cliente podría falsificar cabeceras. Si el servicio ya existía antes de actualizar el Blueprint, revisa esa variable en el panel de Render. Los límites se mantienen en memoria y se reinician con el proceso; para varias instancias se requiere un almacén compartido.
+
+Para evitar que una limpieza compita con un guardado, las imágenes antiguas se conservan y cuentan dentro de la cuota de 30 imágenes o 20 MB por cuenta. La eliminación segura y la recuperación de espacio desde el panel todavía no están implementadas. Antes de poner el servicio a disposición de muchas personas, debe prepararse ese mecanismo y una política de retención.
