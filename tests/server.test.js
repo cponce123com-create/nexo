@@ -30,3 +30,12 @@ test('cambio de contraseña y revocación de sesiones',async t=>{
  assert.equal((await req('/api/password',{method:'POST',cookie:a.cookie,data:{currentPassword:data.password,newPassword:'nueva-clave-segura'}})).status,200);assert.equal((await req('/api/me',{cookie:a.cookie})).status,401);
  assert.equal((await req('/api/login',{method:'POST',data})).status,401);assert.equal((await req('/api/login',{method:'POST',data:{...data,password:'nueva-clave-segura'}})).status,200);
 });
+
+test('verificación y recuperación con tokens temporales de un solo uso',async t=>{
+ const sent=[];const {server,db}=createApp({dbPath:':memory:',secureCookies:false,mailer:async msg=>sent.push(msg)});await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(()=>{db.close();r()})));const base=`http://127.0.0.1:${server.address().port}`;
+ async function req(path,{method='GET',data,cookie}={}){const h={};if(method!=='GET')h.origin=base;if(data)h['content-type']='application/json';if(cookie)h.cookie=cookie;const r=await fetch(base+path,{method,headers:h,body:data?JSON.stringify(data):undefined});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]}}
+ const account={email:'prueba@example.com',password:'contrasena-segura',username:'prueba'};const a=await req('/api/register',{method:'POST',data:account});assert.equal((await req('/api/publish',{method:'POST',cookie:a.cookie})).status,403);
+ assert.equal((await req('/api/verification/request',{method:'POST',cookie:a.cookie})).status,200);const verify=sent.at(-1).token;assert.equal((await req('/api/verify',{method:'POST',data:{token:verify}})).status,200);assert.equal((await req('/api/verify',{method:'POST',data:{token:verify}})).status,400);assert.equal((await req('/api/publish',{method:'POST',cookie:a.cookie})).status,200);
+ assert.equal((await req('/api/password/forgot',{method:'POST',data:{email:'ausente@example.com'}})).status,200);assert.equal((await req('/api/password/forgot',{method:'POST',data:{email:account.email}})).status,200);const reset=sent.at(-1).token;
+ assert.equal((await req('/api/password/reset',{method:'POST',data:{token:reset,password:'nueva-contrasena'}})).status,200);assert.equal((await req('/api/password/reset',{method:'POST',data:{token:reset,password:'nueva-contrasena'}})).status,400);assert.equal((await req('/api/me',{cookie:a.cookie})).status,401);assert.equal((await req('/api/login',{method:'POST',data:{...account,password:'nueva-contrasena'}})).status,200)
+});
