@@ -5,6 +5,7 @@ import {createApp} from '../server/app.js';
 test('cuentas, borradores, publicación, privacidad y cierre de sesión',async t=>{
  const {server,db}=createApp({dbPath:':memory:',secureCookies:false});await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(()=>{db.close();r()})));
  const base=`http://127.0.0.1:${server.address().port}`;
+ assert.equal((await fetch(base+'/demo')).status,200);
  async function call(path,{method='GET',data,cookie,origin=base}={}){const headers={};if(method!=='GET')headers.origin=origin;if(data!==undefined)headers['content-type']='application/json';if(cookie)headers.cookie=cookie;const res=await fetch(base+path,{method,headers,body:data===undefined?undefined:JSON.stringify(data)});return {status:res.status,data:await res.json(),cookie:res.headers.get('set-cookie')?.split(';')[0]}}
  const a=await call('/api/register',{method:'POST',data:{email:'a@example.com',password:'contrasena-segura',username:'aitana'}});assert.equal(a.status,200);
  const b=await call('/api/register',{method:'POST',data:{email:'b@example.com',password:'contrasena-segura',username:'carlos'}});assert.equal(b.status,200);
