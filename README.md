@@ -57,3 +57,7 @@ En «Añadir una red social» se pueden elegir Instagram, TikTok, Facebook, YouT
 En cada producto indica un precio normal y, opcionalmente, un precio con descuento menor. NEXO muestra el porcentaje calculado y envía el precio final en el mensaje de WhatsApp. El porcentaje se redondea a dos decimales. Los productos anteriores sin oferta mantienen su precio normal.
 
 Las imágenes importadas se guardan de forma privada y se hacen visibles en productos publicados. El límite inicial es de 30 imágenes y 20 MB por cuenta; las imágenes no referenciadas por el borrador ni por la versión publicada se depuran al subir otra imagen una vez transcurridas 24 horas. Una imagen cargada debe asociarse y guardarse antes de ese plazo. El almacenamiento requiere disco persistente y copias de seguridad.
+
+## Contacto por Telegram
+
+En Mi tienda se puede configurar un usuario público de Telegram, con o sin `@`, además del número de WhatsApp. Cada producto mostrará los canales configurados y el enlace de Telegram intentará preparar una consulta con el nombre y el precio final. La persona compradora revisa y envía el mensaje en Telegram; no se envía automáticamente ni requiere un bot. El usuario de Telegram será visible en la página.
