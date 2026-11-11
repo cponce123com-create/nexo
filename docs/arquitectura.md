@@ -14,7 +14,7 @@ Para despliegues futuros, usar HTTPS; `NODE_ENV=production` activa cookies Secur
 
 ## Próximos módulos
 
-1. Identidad: verificación de correo, recuperación de acceso, cambio de contraseña y gestión de sesiones con proveedor probado.
+1. Identidad: verificación de correo, recuperación de acceso, recuperación y verificación con proveedor probado; MFA y gestión detallada de sesiones.
 2. Medios: carga a almacenamiento de objetos, validación y límites de tamaño y tipo.
 3. Bloques: texto, video y galerías con contenido seguro y versionado.
 4. Analítica: clics, agregación y limpieza automática; evitar recopilar información innecesaria.

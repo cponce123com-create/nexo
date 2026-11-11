@@ -19,3 +19,14 @@ test('cuentas, borradores, publicación, privacidad y cierre de sesión',async t
  assert.equal((await call('/api/unpublish',{method:'POST',cookie:a.cookie,origin:'https://evil.example'})).status,403);assert.equal((await call('/api/unpublish',{method:'POST',cookie:a.cookie})).status,200);assert.equal((await call('/api/public/aitana')).status,404);
  assert.equal((await call('/api/logout',{method:'POST',cookie:a.cookie})).status,200);assert.equal((await call('/api/me',{cookie:a.cookie})).status,401);assert.equal((await call('/api/me',{cookie:b.cookie})).status,200);
 });
+
+test('cambio de contraseña y revocación de sesiones',async t=>{
+ const {server,db}=createApp({dbPath:':memory:',secureCookies:false});await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(()=>{db.close();r()})));const base=`http://127.0.0.1:${server.address().port}`;
+ async function req(path,{method='GET',data,cookie}={}){const h={};if(method!=='GET')h.origin=base;if(data)h['content-type']='application/json';if(cookie)h.cookie=cookie;const r=await fetch(base+path,{method,headers:h,body:data?JSON.stringify(data):undefined});return {status:r.status,cookie:r.headers.get('set-cookie')?.split(';')[0]}}
+ const data={email:'test@example.com',password:'contrasena-segura',username:'usuario'};
+ const a=await req('/api/register',{method:'POST',data});const b=await req('/api/login',{method:'POST',data});
+ assert.equal((await req('/api/password',{method:'POST',cookie:a.cookie,data:{currentPassword:'incorrecta',newPassword:'nueva-clave-segura'}})).status,401);
+ assert.equal((await req('/api/sessions/revoke',{method:'POST',cookie:a.cookie})).status,200);assert.equal((await req('/api/me',{cookie:b.cookie})).status,401);assert.equal((await req('/api/me',{cookie:a.cookie})).status,200);
+ assert.equal((await req('/api/password',{method:'POST',cookie:a.cookie,data:{currentPassword:data.password,newPassword:'nueva-clave-segura'}})).status,200);assert.equal((await req('/api/me',{cookie:a.cookie})).status,401);
+ assert.equal((await req('/api/login',{method:'POST',data})).status,401);assert.equal((await req('/api/login',{method:'POST',data:{...data,password:'nueva-clave-segura'}})).status,200);
+});

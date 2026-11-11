@@ -31,3 +31,7 @@ Las imágenes se enlazan mediante URL y no se suben a NEXO. Para cambiar el nomb
 - `src/app.js`, `src/preview.js`, `src/styles.css`: editor y página pública.
 - `tests/`: pruebas de modelo y flujos HTTP entre cuentas.
 - `docs/`: arquitectura, referencias y pendientes.
+
+## Seguridad de la cuenta
+
+En el editor, la sección Seguridad permite cambiar la contraseña (cierra todas las sesiones) y cerrar las demás sesiones. La recuperación por correo todavía no está implementada: conserva la contraseña en un gestor seguro.
