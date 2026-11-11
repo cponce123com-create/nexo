@@ -1,3 +1,4 @@
-import http from 'node:http';import {readFile} from 'node:fs/promises';import {resolve,extname,sep} from 'node:path';
-const root=process.cwd(), types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8'};
-http.createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost');let path=decodeURIComponent(url.pathname);if(path==='/')path='/index.html';const file=resolve(root,'.'+path);if(!file.startsWith(root+sep)||!types[extname(file)])throw Error();const data=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)],'X-Content-Type-Options':'nosniff'});res.end(data)}catch{res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'});res.end('No encontrado')}}).listen(process.env.PORT||3000,()=>console.log('NEXO: http://localhost:'+(process.env.PORT||3000)));
+import {createApp} from './server/app.js';
+const port=Number(process.env.PORT||3000),app=createApp({dbPath:process.env.DATABASE_PATH||'nexo.sqlite'});
+app.server.listen(port,()=>console.log(`NEXO disponible en el puerto ${port}`));
+function stop(){app.server.close(()=>{app.db.close();process.exit(0)})}process.on('SIGTERM',stop);process.on('SIGINT',stop);
