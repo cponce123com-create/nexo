@@ -280,3 +280,14 @@ El hecho de que la plataforma sea gratuita para sus usuarios no elimina los cost
 [Arquitectura](docs/arquitectura.md) · [Auditoría](docs/auditoria.md) · [Referencias abiertas](docs/referencias.md)
 
 </div>
+
+## Compartir, estadísticas y organización
+
+- Desde una página publicada puedes copiar su enlace y descargar un QR en formato SVG. El QR usa `PUBLIC_URL` cuando está configurada.
+- Las estadísticas muestran visitas y clics agregados durante los últimos 30 días, separados por enlace o canal de contacto del producto. Son interacciones, no personas únicas; pueden incluir automatizaciones.
+- El editor ofrece cuatro combinaciones de color y permite ordenar aviso, enlaces, tienda y preguntas frecuentes. Las plantillas cambian el color y el fondo, no los datos.
+- Un aviso puede programarse con inicio y fin opcionales. El editor interpreta las fechas en la zona horaria del dispositivo y el servidor las evalúa como instantes UTC. Debes guardar y publicar para aplicar los cambios.
+- Se pueden agregar hasta ocho preguntas frecuentes y marcar productos disponibles o agotados. Los productos agotados no generan botones de consulta.
+- En Configuración puedes descargar tus datos de perfil y versiones guardadas en JSON. Es una exportación de datos, no una copia completa de los archivos de imagen ni de estadísticas.
+
+Para aplicar las nuevas tablas de estadísticas, la aplicación crea las tablas que faltan al iniciar. La cuenta PostgreSQL debe tener permisos de creación. Comprueba con una instalación de pruebas y una copia de seguridad antes de actualizar una base de datos que contenga información real.
