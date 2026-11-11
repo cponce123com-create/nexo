@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS events_page_time ON events(page_id,created_at);`;
 function adapt(client){return {prepare(sql){let i=0;const query=sql.replace(/\?/g,()=>`$${++i}`);return {async get(...params){return (await client.query(query,params)).rows[0]},async all(...params){return (await client.query(query,params)).rows},async run(...params){const r=await client.query(query,params);return {changes:r.rowCount}}}}}}
 export async function openPostgres(connectionString,{pool}={}){
  const dbpool=pool||new Pool({connectionString,max:5,idleTimeoutMillis:30000,connectionTimeoutMillis:15000});
- await dbpool.query(schema);const db=adapt(dbpool);
+ await dbpool.query(schema);await dbpool.query('ALTER TABLE pages ADD COLUMN IF NOT EXISTS suspended INTEGER NOT NULL DEFAULT 0');const db=adapt(dbpool);
  db.transaction=async fn=>{const client=await dbpool.connect();try{await client.query('BEGIN');const result=await fn(adapt(client));await client.query('COMMIT');return result}catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}};
  db.close=()=>dbpool.end();return db;
 }
