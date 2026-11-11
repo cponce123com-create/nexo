@@ -13,5 +13,8 @@ export function openDatabase(path){
  CREATE INDEX IF NOT EXISTS events_page_time ON events(page_id,created_at);
  `);
  const cols=db.prepare('PRAGMA table_info(users)').all();if(!cols.some(col=>col.name==='email_verified'))db.exec('ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0');
+ const imageCols=db.prepare('PRAGMA table_info(images)').all();if(!imageCols.some(col=>col.name==='public_id'))db.exec('ALTER TABLE images ADD COLUMN public_id TEXT');if(!imageCols.some(col=>col.name==='size_bytes'))db.exec('ALTER TABLE images ADD COLUMN size_bytes INTEGER');
+ db.exec('UPDATE images SET size_bytes=length(data) WHERE size_bytes IS NULL AND data IS NOT NULL');
+ let queue=Promise.resolve();db.transaction=fn=>{const task=queue.then(async()=>{db.exec('BEGIN');try{const result=await fn(db);db.exec('COMMIT');return result}catch(err){db.exec('ROLLBACK');throw err}});queue=task.catch(()=>{});return task};
  return db;
 }
