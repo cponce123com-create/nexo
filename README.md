@@ -22,7 +22,7 @@ Los datos se guardan por defecto en `nexo.sqlite` en el directorio actual. La va
 - Botón de WhatsApp que prepara un mensaje con producto y precio. El número del vendedor es visible y la operación no procesa pagos.
 - Recuento de visitas de los últimos 30 días; cuenta solicitudes, no personas únicas.
 
-Las imágenes se enlazan mediante URL y no se suben a NEXO. Para cambiar el nombre de usuario de una página publicada hay que despublicarla primero. La recuperación y confirmación de correo requieren configurar un proveedor.
+Las imágenes de productos se pueden cargar como JPG, PNG o WebP (máximo 2 MB) o enlazar por URL. Las imágenes importadas se guardan en SQLite, cuyo archivo y respaldo incluyen esos datos. Para cambiar el nombre de usuario de una página publicada hay que despublicarla primero. La recuperación y confirmación de correo requieren configurar un proveedor.
 
 ## Organización
 
@@ -48,6 +48,12 @@ Ejecuta `node scripts/backup.js ruta/a/nexo.sqlite ruta/a/copia-nueva.sqlite`. E
 
 ## Demostración de interfaz
 
-Con el servidor en marcha, visita `http://localhost:3000/demo` o selecciona «Explorar demostración» en la pantalla de acceso. La demo usa datos ficticios en memoria; no publica una página y se reinicia al salir. Los productos no tienen número de WhatsApp configurado. Las imágenes vacías son marcadores visuales hasta que se indiquen URLs reales.
+Con el servidor en marcha, visita `http://localhost:3000/demo` o selecciona «Explorar demostración» en la pantalla de acceso. La demo usa datos ficticios en memoria; no publica una página y se reinicia al salir. Los productos no tienen número de WhatsApp configurado. Las imágenes vacías son marcadores visuales hasta que se importe un archivo o se indique una URL.
 
 En «Añadir una red social» se pueden elegir Instagram, TikTok, Facebook, YouTube, WhatsApp, Telegram, X, Threads, LinkedIn, Pinterest, Snapchat, Twitch, Discord y Spotify, además de enlaces generales. Cada usuario debe ingresar la dirección real de su propio perfil.
+
+## Precios y descuentos
+
+En cada producto indica un precio normal y, opcionalmente, un precio con descuento menor. NEXO muestra el porcentaje calculado y envía el precio final en el mensaje de WhatsApp. El porcentaje se redondea a dos decimales. Los productos anteriores sin oferta mantienen su precio normal.
+
+Las imágenes importadas se guardan de forma privada y se hacen visibles en productos publicados. El límite inicial es de 30 imágenes y 20 MB por cuenta; las imágenes no referenciadas por el borrador ni por la versión publicada se depuran al subir otra imagen una vez transcurridas 24 horas. Una imagen cargada debe asociarse y guardarse antes de ese plazo. El almacenamiento requiere disco persistente y copias de seguridad.

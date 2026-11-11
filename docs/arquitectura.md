@@ -8,14 +8,14 @@ El servidor Node utiliza SQLite para usuarios, sesiones, borradores, publicacion
 
 Esta implementación es una base de pruebas, no una infraestructura lista para lanzamiento. SQLite es una base local de una instancia: no proporciona almacenamiento compartido entre réplicas, y en alojamientos con disco efímero se perderían cuentas y perfiles. Migrar a PostgreSQL con transacciones, migraciones, índices y conexiones controladas antes de crecer. El limitador es local y se reinicia al reiniciar la instancia; no protege despliegues distribuidos ni sustituye controles a nivel de proxy.
 
-Se implementaron verificación y recuperación mediante correo configurable, pero falta probar el proveedor real. No hay MFA, captcha, moderación, restricciones de registro, límites por usuario, auditoría administrativa ni gestión de abuso. Tampoco hay subida de archivos: las imágenes son enlaces remotos. Antes de ofrecer el servicio al público, implementar y probar estas capacidades, definir políticas de privacidad, copias de seguridad probadas y restauración, observabilidad, protección contra abuso y retención automatizada. Las cuentas antiguas se marcan como no verificadas al migrar; en desarrollo sin proveedor se omite la verificación.
+Se implementaron verificación y recuperación mediante correo configurable, pero falta probar el proveedor real. No hay MFA, captcha, moderación, restricciones de registro, límites por usuario, auditoría administrativa ni gestión de abuso. Se pueden cargar imágenes de productos a SQLite con límites y control básico de acceso, o usar enlaces remotos. Falta un almacenamiento de objetos y análisis robusto de archivos para producción. Antes de ofrecer el servicio al público, implementar y probar estas capacidades, definir políticas de privacidad, copias de seguridad probadas y restauración, observabilidad, protección contra abuso y retención automatizada. Las cuentas antiguas se marcan como no verificadas al migrar; en desarrollo sin proveedor se omite la verificación.
 
 Para despliegues futuros, usar HTTPS; `NODE_ENV=production` activa cookies Secure. Debe haber almacenamiento persistente y copias seguras. Revisar la configuración del proxy y la detección de origen en el entorno de despliegue. No almacenar datos reales hasta completar estas medidas.
 
 ## Próximos módulos
 
 1. Identidad: probar el proveedor de correo en producción, agregar MFA y gestión detallada de sesiones.
-2. Medios: carga a almacenamiento de objetos, validación y límites de tamaño y tipo.
+2. Medios: migrar los archivos a almacenamiento de objetos, decodificar y reprocesar imágenes y añadir protección ante archivos maliciosos.
 3. Bloques: texto, video y galerías con contenido seguro y versionado.
 4. Analítica: clics, agregación y limpieza automática; evitar recopilar información innecesaria.
 5. Administración y moderación: permisos separados, reportes, límites de uso y auditoría.

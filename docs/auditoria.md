@@ -30,3 +30,10 @@ Las pruebas automatizadas cubren modelos, enlaces, tiendas y flujos HTTP, pero n
 - Se han añadido comprobaciones automatizadas de estos límites y del contraste.
 
 Limitación: no fue posible abrir el servidor local desde el navegador disponible en este entorno. La geometría visual y los recorridos completos mediante clics en móvil y escritorio requieren verificarse en un navegador conectado al servidor antes de su publicación.
+
+## Auditoría de tienda
+
+- El precio normal y la oferta se validan en cliente y servidor; la oferta debe ser menor que el precio normal y acepta hasta dos decimales. El porcentaje se calcula sobre céntimos y el mensaje de WhatsApp usa el precio final.
+- La imagen importada es privada hasta que forme parte de un producto visible publicado. El servidor comprueba que pertenezca a la cuenta; se limitan tipo, tamaño y almacenamiento.
+- Las imágenes se guardan en SQLite, no en almacenamiento de objetos. Se comprueba la firma de los formatos aceptados, pero todavía no se decodifican ni se reprocesan; hace falta endurecer esa validación antes del despliegue público.
+- Quedan pendientes las pruebas visuales y de interacción en navegador, los servicios de almacenamiento escalable y la configuración de infraestructura persistente.
