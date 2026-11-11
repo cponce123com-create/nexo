@@ -1,0 +1,2 @@
+import yauzl from 'yauzl';
+export function readZip(buffer){return new Promise((resolve,reject)=>{yauzl.fromBuffer(buffer,{lazyEntries:true},(err,zip)=>{if(err)return reject(err);const files=new Map();zip.on('entry',entry=>{zip.openReadStream(entry,(e,stream)=>{if(e)return reject(e);const chunks=[];stream.on('data',chunk=>chunks.push(chunk));stream.on('error',reject);stream.on('end',()=>{files.set(entry.fileName,Buffer.concat(chunks));zip.readEntry()})})});zip.on('end',()=>resolve(files));zip.on('error',reject);zip.readEntry()})})}

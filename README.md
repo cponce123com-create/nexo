@@ -74,7 +74,7 @@ flowchart TD
 
 ### Avisos y flyers
 
-Cada página puede configurar un aviso con título, detalles, fecha o lugar, imagen y enlace opcional. Las imágenes cuadradas, horizontales y verticales se muestran conservando su proporción. El aviso se puede ocultar y volver a publicar la página para retirarlo de la versión pública.
+Cada página puede configurar hasta cinco avisos (uno principal y cuatro adicionales) con título, detalles, fecha o lugar, imagen y enlace opcional. Las imágenes cuadradas, horizontales y verticales se muestran conservando su proporción. El aviso se puede ocultar y volver a publicar la página para retirarlo de la versión pública.
 
 ---
 
@@ -288,6 +288,16 @@ El hecho de que la plataforma sea gratuita para sus usuarios no elimina los cost
 - El editor ofrece cuatro combinaciones de color y permite ordenar aviso, enlaces, tienda y preguntas frecuentes. Las plantillas cambian el color y el fondo, no los datos.
 - Un aviso puede programarse con inicio y fin opcionales. El editor interpreta las fechas en la zona horaria del dispositivo y el servidor las evalúa como instantes UTC. Debes guardar y publicar para aplicar los cambios.
 - Se pueden agregar hasta ocho preguntas frecuentes y marcar productos disponibles o agotados. Los productos agotados no generan botones de consulta.
-- En Configuración puedes descargar tus datos de perfil y versiones guardadas en JSON. Es una exportación de datos, no una copia completa de los archivos de imagen ni de estadísticas.
+- En Configuración puedes descargar un ZIP con los datos del perfil y las imágenes importadas de tu cuenta. No incluye estadísticas ni descarga imágenes alojadas por URL externa, y todavía no hay importación automática del ZIP.
 
 Para aplicar las nuevas tablas de estadísticas, la aplicación crea las tablas que faltan al iniciar. La cuenta PostgreSQL debe tener permisos de creación. Comprueba con una instalación de pruebas y una copia de seguridad antes de actualizar una base de datos que contenga información real.
+
+## Galería, avisos y moderación
+
+- **Galería:** hasta 12 elementos entre imágenes importadas o por URL y enlaces a videos. Los videos se abren en su plataforma; NEXO no los aloja ni reproduce incrustados.
+- **Avisos:** hasta cinco en total, cada uno con fechas opcionales y flyer. Los cambios requieren guardar y publicar.
+- **Reportes:** las páginas públicas incluyen un formulario. Las cuentas administradoras pueden consultar los 100 reportes más recientes, descartar uno o despublicar una página; la persona creadora puede volver a publicarla. Las acciones quedan registradas en la tabla `moderation_log`. Esto aún no sustituye un sistema completo de suspensión, apelaciones o protección antispam.
+- **Administración:** configura en Render `ADMIN_EMAILS` con el correo de la cuenta administradora; para varias cuentas sepáralos por comas. Deben ser correos que controles y que la cuenta haya verificado mediante el correo configurado. Si la variable está vacía, nadie tiene acceso administrativo.
+- **ZIP:** incluye `perfil.json` y las imágenes importadas de la cuenta; no incluye estadísticas ni archivos alojados en URLs externas. El ZIP contiene datos privados: guárdalo de forma segura.
+
+Las tablas de reportes y auditoría se crean al iniciar; revisa permisos de PostgreSQL y ten una copia de seguridad antes de actualizar una instalación con datos.
