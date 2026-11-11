@@ -45,3 +45,9 @@ Los enlaces de verificación y recuperación vencen en una hora y son de un solo
 ## Copias de seguridad
 
 Ejecuta `node scripts/backup.js ruta/a/nexo.sqlite ruta/a/copia-nueva.sqlite`. El archivo de destino no debe existir. Guarda la copia cifrada y verifica regularmente que pueda restaurarse; la base contiene datos privados de cuentas.
+
+## Demostración de interfaz
+
+Con el servidor en marcha, visita `http://localhost:3000/demo` o selecciona «Explorar demostración» en la pantalla de acceso. La demo usa datos ficticios en memoria; no publica una página y se reinicia al salir. Los productos no tienen número de WhatsApp configurado. Las imágenes vacías son marcadores visuales hasta que se indiquen URLs reales.
+
+En «Añadir una red social» se pueden elegir Instagram, TikTok, Facebook, YouTube, WhatsApp, Telegram, X, Threads, LinkedIn, Pinterest, Snapchat, Twitch, Discord y Spotify, además de enlaces generales. Cada usuario debe ingresar la dirección real de su propio perfil.
